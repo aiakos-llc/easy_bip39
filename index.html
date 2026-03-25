@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIP39 English Wordlist</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e1a;padding:16px;font-family:'Courier New',Courier,monospace}
+.title{text-align:center;color:#f7931a;font-size:19px;font-weight:700;letter-spacing:2px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1e2a4a}
+.subtitle{text-align:center;color:#4a6080;font-size:12px;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.section{overflow:hidden;border-top:1px solid #1e2a4a;border-bottom:1px solid #1e2a4a}
+.section:first-child{border-left:1px solid #1e2a4a}
+.section:last-child{border-right:1px solid #1e2a4a}
+.section:nth-child(2),.section:nth-child(3),.section:nth-child(4){border-left:2px solid #f7931a}
+.row{display:grid;grid-template-columns:42px 100px 38px 38px 38px;align-items:center;justify-content:center;padding:2px 0}
+.toggle-bar{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:4px}
+.toggle-bar span{color:#4a6080;font-size:13px;font-family:'Courier New',Courier,monospace;letter-spacing:1px}
+.toggle-bar span.active{color:#f7931a;font-weight:700}
+.toggle-btn{position:relative;width:44px;height:22px;background:#1e2a4a;border-radius:11px;cursor:pointer;border:1px solid #2a3a5a;transition:background .3s}
+.toggle-btn .knob{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#f7931a;border-radius:50%;transition:left .3s}
+.toggle-btn.on .knob{left:24px}
+.toggle-btn.on{background:#2a3a5a}
+.row:nth-child(even){background:#0c1120}
+.row:hover{background:#132040}
+.row.row-100{background:#1a2844}
+.head{background:#0d1526;border-bottom:2px solid #1e2a4a}
+.num{font-size:16px;color:#ffffff;text-align:right;padding-right:8px}
+.wd{font-size:16px}
+.pre{color:#f7931a;font-weight:700}
+.rest{color:#d0d0d0}
+.b{font-size:15px;color:#ffffff;font-weight:400;text-align:left}
+.hnum{font-size:13px;font-weight:700;color:#f7931a;text-align:right;padding-right:8px}
+.hwd{font-size:13px;font-weight:700;color:#f7931a}
+.hb{font-size:12px;font-weight:700;color:#f7931a;text-align:left}
+[id]{scroll-margin-top:200px}
+@keyframes rowBlink{0%{background:transparent}10%{background:#f7931a88}30%{background:transparent}45%{background:#f7931a88}60%{background:transparent}75%{background:#f7931a88}100%{background:transparent}}
+.blink{animation:rowBlink 2s ease}
+</style>
+</head>
+<body>
+<div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:#0a0e1a;padding:10px 16px 6px;border-bottom:1px solid #1e2a4a">
+<div class="title">&#x2B21; BIP39 ENGLISH WORDLIST</div>
+<div class="subtitle">Fonte: <a id="sourceLink" href="https://raw.githubusercontent.com/bitcoin/bips/refs/heads/master/bip-0039/english.txt" target="_blank" rel="noopener" style="color:#4a6080;text-decoration:none;border-bottom:1px solid #2a3a5a;transition:color .2s" onmouseover="this.style.color='#f7931a';this.style.borderColor='#f7931a'" onmouseout="this.style.color='#4a6080';this.style.borderColor='#2a3a5a'">raw.githubusercontent.com/bitcoin/bips/refs/heads/master/bip-0039/english.txt</a></div>
+<div style="text-align:center;margin-bottom:6px"><a href="#explicacao" style="color:#4a6080;font-size:13px;font-family:'Courier New',Courier,monospace;text-decoration:none;letter-spacing:1px;border-bottom:1px solid #2a3a5a;padding-bottom:2px;transition:color .2s" onmouseover="this.style.color='#f7931a';this.style.borderColor='#f7931a'" onmouseout="this.style.color='#4a6080';this.style.borderColor='#2a3a5a'">&#x25BE; IR PARA EXPLICAÇÃO</a></div>
+<div id="navrow" style="display:flex;justify-content:center;flex-wrap:wrap;gap:4px 2px;margin-bottom:4px;padding:0 8px"></div>
+<div id="alpharow" style="display:flex;justify-content:center;flex-wrap:wrap;gap:4px 2px;margin-bottom:6px;padding:0 8px"></div>
+<div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:6px">
+<div class="toggle-bar" style="margin-bottom:0">
+  <span id="lbl4" class="active">4 PRIMEIRAS</span>
+  <div class="toggle-btn" id="caseToggle" onclick="toggleCase()"><div class="knob"></div></div>
+  <span id="lblAll">TODAS MAIÚSCULAS</span>
+</div>
+<div class="toggle-bar" style="margin-bottom:0">
+  <span id="lblFilterOff" class="active">TODAS</span>
+  <div class="toggle-btn" id="filterToggle" onclick="toggleFilter()"><div class="knob"></div></div>
+  <span id="lblFilterOn">FILTRAR LETRA</span>
+</div>
+</div>
+</div>
+<div id="loadMsg" style="text-align:center;padding:40px 20px;display:none">
+  <div style="color:#e0e0e0;font-size:16px;font-family:'Courier New',Courier,monospace;margin-bottom:16px">Carregando wordlist...</div>
+</div>
+<div id="errorMsg" style="text-align:center;padding:40px 20px;display:none">
+  <div style="color:#f7931a;font-size:18px;font-family:'Courier New',Courier,monospace;font-weight:700;margin-bottom:16px">&#x26A0; Arquivo english.txt n&atilde;o encontrado</div>
+  <div style="color:#e0e0e0;font-size:14px;font-family:'Courier New',Courier,monospace;line-height:2;max-width:700px;margin:0 auto">
+    Este arquivo requer a wordlist BIP39 no mesmo diret&oacute;rio.<br><br>
+    <span style="color:#f7931a">Op&ccedil;&atilde;o 1 (recomendada)</span> &mdash; Baixe da fonte prim&aacute;ria:<br>
+    <a href="https://raw.githubusercontent.com/bitcoin/bips/refs/heads/master/bip-0039/english.txt" target="_blank" rel="noopener" style="color:#4a6080;word-break:break-all">https://raw.githubusercontent.com/bitcoin/bips/refs/heads/master/bip-0039/english.txt</a><br><br>
+    <span style="color:#f7931a">Op&ccedil;&atilde;o 2</span> &mdash; Use a c&oacute;pia inclu&iacute;da no reposit&oacute;rio da AIAKOS.<br><br>
+    Salve o arquivo como <span style="color:#ffffff;font-weight:700">english.txt</span> no mesmo diret&oacute;rio deste HTML e recarregue a p&aacute;gina.
+  </div>
+</div>
+<div class="grid" id="grid"></div>
+
+<div id="loadError" style="display:none;text-align:center;padding:40px 24px;margin:30px auto;max-width:800px;background:#1a0a00;border:2px solid #f7931a;border-radius:8px">
+  <div style="color:#f7931a;font-size:24px;font-weight:700;margin-bottom:20px">&#x26A0; Lista de palavras não encontrada</div>
+  <div style="color:#e0e0e0;font-size:16px;line-height:1.9;max-width:700px;margin:0 auto;text-align:left">
+    O arquivo com as <span style="color:#f7931a;font-weight:700">2048 palavras que compõem uma seed phrase</span> não foi encontrado.<br><br>
+    <span style="color:#ffffff">O que é uma seed phrase?</span> É a sequência de 12 ou 24 palavras gerada quando você cria uma carteira Bitcoin. Essas palavras são a chave mestra do seu patrimônio: quem as possui, controla os fundos. Todas são escolhidas a partir de uma lista padronizada chamada <span style="color:#f7931a">BIP39</span>, que contém exatamente 2048 palavras em inglês.<br><br>
+    Para usar esta ferramenta, baixe o arquivo <span style="color:#f7931a;font-weight:700">english.txt</span> diretamente da fonte primária do Bitcoin:<br>
+    <a href="https://raw.githubusercontent.com/bitcoin/bips/refs/heads/master/bip-0039/english.txt" target="_blank" rel="noopener" style="color:#f7931a;font-weight:700;word-break:break-all">https://raw.githubusercontent.com/bitcoin/bips/refs/heads/master/bip-0039/english.txt</a><br><br>
+    <span style="color:#ffffff;font-weight:700">Se está abrindo este arquivo localmente</span>, o navegador bloqueia o carregamento automático por segurança. Você pode selecionar o arquivo manualmente:<br><br>
+    <div style="text-align:center;margin:16px 0">
+      <label for="fileInput" style="display:inline-block;cursor:pointer;background:#f7931a;color:#0a0e1a;font-weight:700;font-size:15px;padding:10px 24px;border-radius:4px;font-family:'Courier New',Courier,monospace;letter-spacing:1px">SELECIONAR english.txt</label>
+      <input type="file" id="fileInput" accept=".txt" style="display:none">
+    </div>
+    <span style="color:#e0e0e0;font-size:14px;font-style:italic">Não confie, verifique. O repositório da AIAKOS inclui uma cópia por conveniência, mas recomendamos sempre baixar da fonte primária: o repositório oficial do Bitcoin.</span>
+  </div>
+</div>
+
+<div id="explicacao" style="margin-top:40px;padding:20px 24px 28px;border-top:2px solid #f7931a">
+
+  <div style="color:#f7931a;font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:20px">PESO DE CADA BIT (quando = 1)</div>
+
+  <table style="border-collapse:collapse;width:100%">
+    <thead>
+      <tr>
+        <td colspan="4" style="padding:4px 0;font-size:11px;color:#4a6080;text-align:center;border-bottom:1px solid #1e2a4a">grupo 1</td>
+        <td colspan="4" style="padding:4px 0;font-size:11px;color:#4a6080;text-align:center;border-bottom:1px solid #1e2a4a">grupo 2</td>
+        <td colspan="4" style="padding:4px 0;font-size:11px;color:#4a6080;text-align:center;border-bottom:1px solid #1e2a4a">grupo 3</td>
+        <td style="width:100px"></td>
+      </tr>
+    </thead>
+    <tbody id="weighttbl"></tbody>
+  </table>
+
+  <div style="margin-top:24px;padding:14px 16px;background:#0d1526;border:1px solid #1e2a4a;border-radius:4px">
+    <div style="color:#4a6080;font-size:11px;letter-spacing:1px;margin-bottom:12px">EXEMPLO REAL &mdash; palavra #1350</div>
+    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <div><span style="color:#f7931a;font-weight:700;font-size:22px">POTA</span><span style="color:#d0d0d0;font-weight:700;font-size:22px">TO</span><span style="color:#d0d0d0;font-size:14px;margin-left:8px">&middot; &iacute;ndice <span style="color:#ffffff;font-weight:700">1350</span></span></div>
+      <div style="font-size:18px;letter-spacing:3px"><span style="color:#f7931a">0101</span><span style="color:#4a6080;margin:0 6px">&middot;</span><span style="color:#f7931a">0100</span><span style="color:#4a6080;margin:0 6px">&middot;</span><span style="color:#f7931a">0110</span></div>
+      <div style="color:#d0d0d0;font-size:13px;line-height:2">
+        bit 11 = <span style="color:#ffffff">1024</span>
+        <span style="color:#4a6080;margin:0 5px">+</span>
+        bit 9 = <span style="color:#ffffff">256</span>
+        <span style="color:#4a6080;margin:0 5px">+</span>
+        bit 7 = <span style="color:#ffffff">64</span>
+        <span style="color:#4a6080;margin:0 5px">+</span>
+        bit 3 = <span style="color:#ffffff">4</span>
+        <span style="color:#4a6080;margin:0 5px">+</span>
+        bit 2 = <span style="color:#ffffff">2</span>
+        <span style="color:#4a6080;margin:0 8px">=</span>
+        <span style="color:#f7931a;font-weight:700;font-size:18px">1350</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;padding:14px 16px;background:#0d1526;border:1px solid #1e2a4a;border-radius:4px">
+    <div style="color:#f7931a;font-size:11px;letter-spacing:1px;margin-bottom:12px">POR QUE APENAS AS 4 PRIMEIRAS LETRAS S&Atilde;O SUFICIENTES?</div>
+    <div style="color:#d0d0d0;font-size:13px;line-height:1.9">
+      O BIP39 foi projetado com uma restri&ccedil;&atilde;o deliberada: <span style="color:#ffffff">nenhuma das 2048 palavras compartilha as mesmas 4 letras iniciais com outra palavra da lista.</span>
+      <br><br>
+      Isso significa que ao digitar ou conferir uma seed phrase, basta identificar as 4 primeiras letras para determinar a palavra com <span style="color:#ffffff">100% de certeza</span> &mdash; as letras restantes s&atilde;o redundantes para fins de identifica&ccedil;&atilde;o.
+      <br><br>
+      <span style="color:#4a6080">Exemplos que ilustram o princ&iacute;pio:</span><br>
+      &nbsp;&middot; <span style="color:#f7931a">POTA</span>to &nbsp;&rarr; apenas <span style="color:#f7931a">POTA</span> j&aacute; identifica esta palavra<br>
+      &nbsp;&middot; <span style="color:#f7931a">POWE</span>r &nbsp;&nbsp;&rarr; apenas <span style="color:#f7931a">POWE</span> j&aacute; identifica esta palavra<br>
+      &nbsp;&middot; <span style="color:#f7931a">PRAC</span>tice &rarr; apenas <span style="color:#f7931a">PRAC</span> j&aacute; identifica esta palavra<br>
+      <br>
+      Essa propriedade reduz erros de digita&ccedil;&atilde;o em carteiras de hardware e facilita a verifica&ccedil;&atilde;o manual &mdash; qualquer prefixo de 4 letras &eacute; uma chave un&iacute;voca para o &iacute;ndice bin&aacute;rio correspondente.
+    </div>
+  </div>
+
+</div>
+
+<script>
+var words=null;
+
+function loadFromFile(text){
+  var w=text.trim().split('\n').map(function(s){return s.trim()}).filter(function(s){return s.length>0});
+  if(w.length!==2048){alert('Arquivo inválido: esperado 2048 palavras, encontradas '+w.length);return;}
+  words=w;
+  document.getElementById('loadError').style.display='none';
+  document.getElementById('grid').style.display='grid';
+  buildTable();
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('fileInput').addEventListener('change',function(e){
+    var file=e.target.files[0];
+    if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(ev){loadFromFile(ev.target.result)};
+    reader.readAsText(file);
+  });
+});
+
+(async function(){
+  try{
+    var resp=await fetch('english.txt');
+    if(!resp.ok) throw new Error('not found');
+    var text=await resp.text();
+    var w=text.trim().split('\n').map(function(s){return s.trim()}).filter(function(s){return s.length>0});
+    if(w.length!==2048) throw new Error('invalid wordlist: '+w.length+' words');
+    words=w;
+    buildTable();
+  }catch(e){
+    document.getElementById('loadError').style.display='block';
+    document.getElementById('grid').style.display='none';
+  }
+})();
+
+function b4(n,s){return n.toString(2).padStart(12,'0').slice(s,s+4)}
+
+var allUpper=false;
+var activeLetter=null;
+var filterMode=false;
+var seenLetters={};
+
+function toggleCase(){
+  allUpper=!allUpper;
+  var btn=document.getElementById('caseToggle');
+  var lbl4=document.getElementById('lbl4');
+  var lblAll=document.getElementById('lblAll');
+  btn.classList.toggle('on',allUpper);
+  lbl4.classList.toggle('active',!allUpper);
+  lblAll.classList.toggle('active',allUpper);
+  document.querySelectorAll('.wd').forEach(function(el){
+    var w=el.getAttribute('data-word');
+    el.querySelector('.pre').textContent=w.slice(0,4).toUpperCase();
+    el.querySelector('.rest').textContent=allUpper?w.slice(4).toUpperCase():w.slice(4);
+  });
+}
+
+function blinkRow(el){
+  el.classList.remove('blink');
+  void el.offsetWidth;
+  el.classList.add('blink');
+  el.addEventListener('animationend',function(){el.classList.remove('blink')},{once:true});
+}
+
+function buildTable(){
+
+document.getElementById('grid').innerHTML='';
+var existing=document.getElementById('filteredGrid');
+if(existing) existing.remove();
+seenLetters={};
+activeLetter=null;
+filterMode=false;
+
+const g=document.getElementById('grid');
+const SIZE=Math.ceil(2048/4);
+for(let s=0;s<4;s++){
+  const sec=document.createElement('div');
+  sec.className='section';
+  const h=document.createElement('div');
+  h.className='row head';
+  h.innerHTML='<div class="hnum">#</div><div class="hwd">Word</div><div class="hb">0000</div><div class="hb">0000</div><div class="hb">0000</div>';
+  sec.appendChild(h);
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<SIZE;i++){
+    const idx=s*SIZE+i;
+    if(idx>=2048)break;
+    const w=words[idx];
+    const r=document.createElement('div');
+    r.className='row';
+    if(idx>0&&idx%100===0){r.id='w'+idx;r.classList.add('row-100');}
+    const fl=w[0].toUpperCase();
+    if(!seenLetters[fl]){seenLetters[fl]=idx;r.id='letter-'+fl;}
+    r.innerHTML=`<div class="num">${idx}</div><div class="wd" data-word="${w}"><span class="pre">${w.slice(0,4).toUpperCase()}</span><span class="rest">${w.slice(4)}</span></div><div class="b">${b4(idx,0)}</div><div class="b">${b4(idx,4)}</div><div class="b">${b4(idx,8)}</div>`;
+    frag.appendChild(r);
+  }
+  sec.appendChild(frag);
+  g.appendChild(sec);
+}
+
+(function(){
+  var nav=document.getElementById('navrow');
+  for(var n=100;n<=2000;n+=100){
+    var a=document.createElement('a');
+    a.href='#w'+n;
+    a.textContent=n;
+    a.style.cssText='color:#e0e0e0;font-size:14px;font-family:Courier New,monospace;text-decoration:none;padding:3px 6px;border:1px solid #1e2a4a;border-radius:3px;transition:all .2s';
+    a.onclick=function(e){
+      var targetId=this.getAttribute('href').slice(1);
+      if(filterMode||activeLetter){
+        filterMode=false;activeLetter=null;
+        document.getElementById('filterToggle').classList.remove('on');
+        document.getElementById('lblFilterOff').classList.add('active');
+        document.getElementById('lblFilterOn').classList.remove('active');
+        document.querySelectorAll('.alpha-link').forEach(function(el){el.style.background='transparent';el.style.color='#e0e0e0';el.style.borderColor='#1e2a4a'});
+        applyFilter();
+      }
+      setTimeout(function(){
+        var target=document.getElementById(targetId);
+        if(target) blinkRow(target);
+      },300);
+    };
+    a.onmouseover=function(){this.style.color='#f7931a';this.style.borderColor='#f7931a'};
+    a.onmouseout=function(){this.style.color='#e0e0e0';this.style.borderColor='#1e2a4a'};
+    nav.appendChild(a);
+  }
+})();
+
+(function(){
+  var alpha=document.getElementById('alpharow');
+  for(var c=65;c<=90;c++){
+    var ch=String.fromCharCode(c);
+    var a=document.createElement('a');
+    a.setAttribute('data-letter',ch);
+    a.href='#letter-'+ch;
+    a.textContent=ch;
+    a.className='alpha-link';
+    a.style.cssText='color:#e0e0e0;font-size:14px;font-family:Courier New,monospace;text-decoration:none;padding:3px 7px;border:1px solid #1e2a4a;border-radius:3px;transition:all .2s';
+    if(!seenLetters[ch]){a.style.opacity='0.3';a.style.pointerEvents='none';}
+    a.onclick=function(e){
+      activeLetter=this.getAttribute('data-letter');
+      document.querySelectorAll('.alpha-link').forEach(function(el){el.style.background='transparent';el.style.color='#e0e0e0';el.style.borderColor='#1e2a4a'});
+      this.style.background='#f7931a';this.style.color='#0a0e1a';this.style.borderColor='#f7931a';
+      if(filterMode){applyFilter();}
+      else{
+        var target=document.getElementById('letter-'+activeLetter);
+        if(target){blinkRow(target);}
+      }
+    };
+    a.onmouseover=function(){if(this.getAttribute('data-letter')!==activeLetter){this.style.color='#f7931a';this.style.borderColor='#f7931a'}};
+    a.onmouseout=function(){if(this.getAttribute('data-letter')!==activeLetter){this.style.color='#e0e0e0';this.style.borderColor='#1e2a4a'}};
+    alpha.appendChild(a);
+  }
+})();
+
+} // end buildTable
+
+function toggleFilter(){
+  if(!filterMode&&!activeLetter) return;
+  filterMode=!filterMode;
+  var btn=document.getElementById('filterToggle');
+  var lblOff=document.getElementById('lblFilterOff');
+  var lblOn=document.getElementById('lblFilterOn');
+  btn.classList.toggle('on',filterMode);
+  lblOff.classList.toggle('active',!filterMode);
+  lblOn.classList.toggle('active',filterMode);
+  if(!filterMode){
+    activeLetter=null;
+    document.querySelectorAll('.alpha-link').forEach(function(el){el.style.background='transparent';el.style.color='#e0e0e0';el.style.borderColor='#1e2a4a'});
+  }
+  applyFilter();
+  if(!filterMode){
+    document.getElementById('grid').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+function applyFilter(){
+  var grid=document.getElementById('grid');
+  var filtered=document.getElementById('filteredGrid');
+  if(!filterMode||!activeLetter){
+    grid.style.display='grid';
+    if(filtered) filtered.style.display='none';
+    return;
+  }
+  grid.style.display='none';
+  // collect matching words
+  var matches=[];
+  for(var i=0;i<words.length;i++){
+    if(words[i][0].toUpperCase()===activeLetter) matches.push({idx:i,word:words[i]});
+  }
+  if(!filtered){
+    filtered=document.createElement('div');
+    filtered.id='filteredGrid';
+    filtered.className='grid';
+    grid.parentNode.insertBefore(filtered,grid.nextSibling);
+  }
+  filtered.style.display='grid';
+  filtered.innerHTML='';
+  var cols=4;
+  var perCol=Math.ceil(matches.length/cols);
+  for(var c=0;c<cols;c++){
+    var sec=document.createElement('div');
+    sec.className='section';
+    if(c>0) sec.style.borderLeft='2px solid #f7931a';
+    var h=document.createElement('div');
+    h.className='row head';
+    h.innerHTML='<div class="hnum">#</div><div class="hwd">Word</div><div class="hb">0000</div><div class="hb">0000</div><div class="hb">0000</div>';
+    sec.appendChild(h);
+    var frag=document.createDocumentFragment();
+    for(var r=0;r<perCol;r++){
+      var mi=c*perCol+r;
+      if(mi>=matches.length) break;
+      var m=matches[mi];
+      var row=document.createElement('div');
+      row.className='row';
+      var pre=allUpper?m.word.slice(0,4).toUpperCase():m.word.slice(0,4).toUpperCase();
+      var rest=allUpper?m.word.slice(4).toUpperCase():m.word.slice(4);
+      row.innerHTML='<div class="num">'+m.idx+'</div><div class="wd" data-word="'+m.word+'"><span class="pre">'+pre+'</span><span class="rest">'+rest+'</span></div><div class="b">'+b4(m.idx,0)+'</div><div class="b">'+b4(m.idx,4)+'</div><div class="b">'+b4(m.idx,8)+'</div>';
+      frag.appendChild(row);
+    }
+    sec.appendChild(frag);
+    filtered.appendChild(sec);
+  }
+  filtered.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+(function(){
+  const rows=[
+    {label:'posicao', fn:function(i){return 'bit '+(12-i)}, color:'#4a6080', size:'12px', fw:'400'},
+    {label:'bit',     fn:function(i){return '1'},           color:'#f7931a', size:'16px', fw:'700'},
+    {label:'peso',    fn:function(i){return Math.pow(2,11-i)}, color:'#ffffff', size:'14px', fw:'500'},
+  ];
+  var tbody=document.getElementById('weighttbl');
+  rows.forEach(function(row){
+    var tr=document.createElement('tr');
+    for(var i=0;i<12;i++){
+      var td=document.createElement('td');
+      td.style.cssText='text-align:center;padding:6px 2px;font-family:Courier New,monospace;color:'+row.color+';font-size:'+row.size+';font-weight:'+row.fw+';border-bottom:0.5px solid #1e2a4a';
+      var val=row.fn(i);
+      td.textContent=typeof val==='number'?val.toLocaleString('pt-BR'):val;
+      if(i===3||i===7) td.style.borderRight='2px solid #f7931a';
+      tr.appendChild(td);
+    }
+    var tdtot=document.createElement('td');
+    tdtot.style.cssText='text-align:right;padding:6px 0 6px 12px;font-family:Courier New,monospace;font-size:12px;color:#4a6080;white-space:nowrap;border-bottom:0.5px solid #1e2a4a';
+    if(row.label==='peso'){tdtot.textContent='total = 4.095';tdtot.style.color='#ffffff';tdtot.style.fontWeight='500';}
+    else if(row.label==='bit'){tdtot.textContent='(todos = 1)';tdtot.style.fontSize='11px';}
+    tr.appendChild(tdtot);
+    tbody.appendChild(tr);
+  });
+})();
+window.toggleCase=toggleCase;
+window.toggleFilter=toggleFilter;
+window.applyFilter=applyFilter;
+</script>
+</body>
+</html>
